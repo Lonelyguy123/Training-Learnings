@@ -7,7 +7,6 @@ from passlib.context import CryptContext
 
 from database import get_db
 
-# ── Config ──────────────────────────────────────────────────────────────────
 SECRET_KEY = "9d17c199e4b74abc42cd61e00ad30bd0355bee9b3c479f838c9f36022749ecc9"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -15,14 +14,12 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ── Password helpers ─────────────────────────────────────────────────────────
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
-# ── JWT helpers ───────────────────────────────────────────────────────────────
 def _create_token(data: dict, expires_delta: timedelta, token_type: str) -> str:
     payload = data.copy()
     payload.update({
@@ -85,7 +82,6 @@ def revoke_token(token: str):
     except JWTError:
         pass
 
-# ── User DB helpers ───────────────────────────────────────────────────────────
 def get_user(username: str) -> Optional[dict]:
     conn = get_db()
     row = conn.execute(

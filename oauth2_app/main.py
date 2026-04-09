@@ -12,7 +12,7 @@ from auth import (
     create_refresh_token, decode_token, revoke_token, get_user,
 )
 
-# ── App setup ─────────────────────────────────────────────────────────────────
+
 app = FastAPI(title="OAuth2 Auth Demo", version="1.0.0")
 templates = Jinja2Templates(directory="templates")
 
@@ -22,7 +22,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 def startup():
     init_db()
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+
 class RegisterRequest(BaseModel):
     username: str
     email: str
@@ -57,7 +57,7 @@ class UserResponse(BaseModel):
     is_active: int
     created_at: str
 
-# ── Dependency: get current user from Bearer token ────────────────────────────
+
 def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -75,7 +75,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         raise credentials_exception
     return user
 
-# ── Auth routes ───────────────────────────────────────────────────────────────
+
 @app.post("/auth/register", response_model=UserResponse, status_code=201,
           summary="Register a new user")
 def register(body: RegisterRequest):
@@ -124,7 +124,7 @@ def logout(token: str = Depends(oauth2_scheme)):
     revoke_token(token)
     return {"message": "Logged out successfully"}
 
-# ── Protected routes ──────────────────────────────────────────────────────────
+
 @app.get("/users/me", response_model=UserResponse,
          summary="Get current user profile (protected)")
 def me(current_user: dict = Depends(get_current_user)):
@@ -138,7 +138,6 @@ def dashboard(current_user: dict = Depends(get_current_user)):
         "member_since": current_user["created_at"],
     }
 
-# ── Frontend routes ───────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
